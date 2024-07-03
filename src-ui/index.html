@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+  </head>
+
+  <body>
+    <h2>Enter summoner name and region</h2>
+
+    <form id="summoner-form">
+      <label for="summoner-name" hidden>Summoner name</label>
+      <input name="summoner-name" id="summoner-name" type="text" placeholder="IGN#TAG">
+      <p id="summoner-name-invalid"></p>
+
+      <label for="summoner-region" hidden>Summoner region</label>
+      <select name="summoner-region" id="summoner-region">
+        <option value="north america">North America</option>
+        <option value="korea">Korea</option>
+      </select>
+      <p id="summoner-region-invalid"></p>
+
+      <input type="submit" value="submit">
+      <p id="summoner-invalid"></p>
+    </form>
+
+    <h2 id="top-players-h2">Top players</h2>
+
+    <script src="/main.js"></script>
+  </body>
+</html>
