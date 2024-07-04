@@ -1,7 +1,6 @@
-# Tauri + Vanilla
+# OPGG clone app
+Remake of https://github.com/lordlflm/Opgg-Clone-App using Tauri and Riot API raw requests instead of a wrapper.
 
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Javascript.
+A GUI app that displays League of Legends player statistics.
 
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+OPGG clone app v2 isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
