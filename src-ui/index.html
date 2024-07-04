@@ -8,21 +8,23 @@
   </head>
 
   <body>
-    <h2>Enter summoner name and region</h2>
+    <h2>Enter in-game summoner name and region</h2>
 
     <form id="summoner-form">
       <label for="summoner-name" hidden>Summoner name</label>
       <input name="summoner-name" id="summoner-name" type="text" placeholder="IGN#TAG">
       <p id="summoner-name-invalid"></p>
+      <p id="summoner-tag-invalid"></p>
 
       <label for="summoner-region" hidden>Summoner region</label>
       <select name="summoner-region" id="summoner-region">
+        <option value="">Select region</option>
         <option value="north america">North America</option>
         <option value="korea">Korea</option>
       </select>
       <p id="summoner-region-invalid"></p>
 
-      <input type="submit" value="submit">
+      <input type="submit" value="Submit">
       <p id="summoner-invalid"></p>
     </form>
 

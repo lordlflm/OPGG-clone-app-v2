@@ -13,10 +13,16 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
 
     // TODO make sure name is of valid length
     if (data["summoner-name"] == "") {
-        document.getElementById("summoner-name-invalid").textContent = "invalid summoner name"
+        document.getElementById("summoner-name-invalid").textContent = "invalid summoner name";
         invalidFlag++;
     } else {
-        document.getElementById("summoner-name-invalid").textContent = ""
+        document.getElementById("summoner-name-invalid").textContent = "";
+    }
+    if (!data["summoner-name"].includes("#")) {
+        document.getElementById("summoner-tag-invalid").textContent = "invalid #tagline";
+        invalidFlag++;
+    } else {
+        document.getElementById("summoner-tag-invalid").textContent = "";
     }
     if (!validRegions.includes(data["summoner-region"])) {
         document.getElementById("summoner-region-invalid").textContent = "invalid region";
@@ -31,7 +37,7 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
 
     if (invalidFlag == 0) {
         try {
-            const response = await invoke('get_summoner', { data });
+            const response = await invoke('get_account', { data });
             console.debug(response)
             if (response.success) {
                 document.getElementById("summoner-invalid").textContent = "";
