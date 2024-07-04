@@ -5,7 +5,8 @@ use dotenv::dotenv;
 use lazy_static::lazy_static;
 use urlencoding::encode;
 use reqwest::Error;
-use serde::Deserialize;
+
+use std::collections::HashMap;
 
 lazy_static! {
   static ref RIOT_API_KEY: String = {
@@ -23,7 +24,7 @@ fn main() {
 }
 
 #[tauri::command]
-async fn get_account(data: std::collections::HashMap<String, String>) -> Result<std::collections::HashMap<String, String>, String> {
+fn get_account(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
   let summoner_name: String;
   let summoner_tag: String;
   let summoner_region: String;
@@ -36,7 +37,7 @@ async fn get_account(data: std::collections::HashMap<String, String>) -> Result<
         None => return Err("Something went wrong: No summoner tag".to_string()),
       }
       summoner_name = name[..i].to_string();
-      summoner_tag = name[i..].to_string();
+      summoner_tag = name[i+1..].to_string();
     },
     None => return Err("Something went wrong: No summoner name".to_string()),
   }
@@ -46,13 +47,7 @@ async fn get_account(data: std::collections::HashMap<String, String>) -> Result<
     None => return Err("Something went wrong: No summoner region".to_string()),
   }
 
-  let puuid_response = reqwest::get(format!("https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={api_key}",
-                                          region = "americas",
-                                          name = encode(&summoner_name),
-                                          tag = summoner_tag,
-                                          api_key = *RIOT_API_KEY))
-    .await?;
-
+  let _ = puuid_request(summoner_name, summoner_tag);
   // #[derive(Deserialize, Debug)]
   // struct Puuid {
   //   puuid: std::collections::HashMap<String, String>,
@@ -71,4 +66,22 @@ async fn get_account(data: std::collections::HashMap<String, String>) -> Result<
   let mut response = std::collections::HashMap::new();
   response.insert("success".to_string(), "true".to_string());
   Ok(response)
+}
+
+#[tokio::main]
+async fn puuid_request(summoner_name: String, summoner_tag: String) -> Result<(), Error> {
+  let url = format!("https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={api_key}",
+    region = "americas",
+    name = encode(&summoner_name),
+    tag = summoner_tag,
+    api_key = *RIOT_API_KEY);
+
+  println!("{}", url);
+  let puuid_response = reqwest::get(url)
+    .await?
+    .json::<HashMap<String, String>>()
+    .await?;
+
+  println!("{:#?}", puuid_response);
+  Ok(())
 }
