@@ -39,14 +39,16 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
         try {
             const response = await invoke('get_account', { data });
             console.debug(response)
-            if (response.success) {
+            if (response.success == "true") {
+                console.debug("IS OK");
                 document.getElementById("summoner-invalid").textContent = "";
                 // TODO render summoner page and pass it arguments
             } else {
+                console.debug("OLOLO web");
                 document.getElementById("summoner-invalid").textContent = "This summoner does not exist";
             }
         } catch (error) {
-
+            console.error('Error:', error);
         }
     }
 });
