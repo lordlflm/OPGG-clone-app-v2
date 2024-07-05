@@ -38,13 +38,14 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
     if (invalidFlag == 0) {
         try {
             const response = await invoke('get_account', { data });
-            console.debug(response)
-            if (response.success == "true") {
-                console.debug("IS OK");
+            if (response.success === "true") {
                 document.getElementById("summoner-invalid").textContent = "";
                 // TODO render summoner page and pass it arguments
+                const queryParams = new URLSearchParams();
+                queryParams.append("puuid", response.puuid);
+                queryParams.append("region", data["summoner-region"]);
+                window.location.href = `summoner.html?${queryParams.toString()}`;
             } else {
-                console.debug("OLOLO web");
                 document.getElementById("summoner-invalid").textContent = "This summoner does not exist";
             }
         } catch (error) {

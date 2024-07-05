@@ -14,6 +14,7 @@ fn main() {
 
 #[tauri::command]
 fn get_account(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
+  let mut response = HashMap::new();
   let summoner_name: String;
   let summoner_tag: String;
   let summoner_region: String;
@@ -37,16 +38,15 @@ fn get_account(data: HashMap<String, String>) -> Result<HashMap<String, String>,
     None => return Err("Something went wrong: No summoner region".to_string()),
   }
 
-  match urgot::get_puuid_from_gamename(summoner_name, summoner_tag) {
+  match urgot::get_puuid_from_gamename(summoner_name, summoner_tag, summoner_region) {
     Ok(puuid) => summoner_puuid = puuid,
     Err(_) => {
-      let mut response = HashMap::new();
       response.insert("success".to_string(), "false".to_string());
       return Ok(response);
     },
   }
 
-  let mut response = HashMap::new();
   response.insert("success".to_string(), "true".to_string());
+  response.insert("puuid".to_string(), summoner_puuid);
   Ok(response)
 }
