@@ -1,6 +1,7 @@
-const { invoke } = window.__TAURI__.tauri
+const { invoke } = window.__TAURI__.tauri;
 
-validRegions = ["north america", "korea"]
+validRegions = ["north america", "korea", "europe west", "europe nordic & east", "oceania", "japan", "brazil",
+                "LAS", "LAN", "russia", "turkiye", "singapore", "philippines", "taiwan", "vietnam", "thailand"];
 
 document.getElementById("summoner-form").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -9,8 +10,6 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
     const data = Object.fromEntries(formData);
     invalidFlag = 0;
 
-    console.debug(data)
-
     // TODO make sure name is of valid length
     if (data["summoner-name"] == "") {
         document.getElementById("summoner-name-invalid").textContent = "invalid summoner name";
@@ -18,6 +17,7 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
     } else {
         document.getElementById("summoner-name-invalid").textContent = "";
     }
+    //TODO make sure tagline is valid/of valid length
     if (!data["summoner-name"].includes("#")) {
         document.getElementById("summoner-tag-invalid").textContent = "invalid #tagline";
         invalidFlag++;
@@ -33,17 +33,17 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
     
     //TODO sanitize data for XSS/SQLi
     //TODO trim spaces
-    //TODO make sure tagline is there, valid, of valid length
 
     if (invalidFlag == 0) {
         try {
-            const response = await invoke('get_account', { data });
+            const response = await invoke('get_account_puuid', { data });
             if (response.success === "true") {
                 document.getElementById("summoner-invalid").textContent = "";
-                // TODO render summoner page and pass it arguments
                 const queryParams = new URLSearchParams();
+                queryParams.append("ign", response.ign);
+                queryParams.append("tag", response.tag);
+                queryParams.append("region", response.region);
                 queryParams.append("puuid", response.puuid);
-                queryParams.append("region", data["summoner-region"]);
                 window.location.href = `summoner.html?${queryParams.toString()}`;
             } else {
                 document.getElementById("summoner-invalid").textContent = "This summoner does not exist";

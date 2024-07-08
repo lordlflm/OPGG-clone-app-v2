@@ -1,19 +1,21 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod urgot;
+mod scuttle;
 
 use std::collections::HashMap;
 
+use reqwest::Response;
+
 fn main() {
   tauri::Builder::default()
-  .invoke_handler(tauri::generate_handler![get_account])
+  .invoke_handler(tauri::generate_handler![get_account_puuid, get_account])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn get_account(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
+fn get_account_puuid(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
   let mut response = HashMap::new();
   let summoner_name: String;
   let summoner_tag: String;
@@ -38,7 +40,7 @@ fn get_account(data: HashMap<String, String>) -> Result<HashMap<String, String>,
     None => return Err("Something went wrong: No summoner region".to_string()),
   }
 
-  match urgot::get_puuid_from_gamename(summoner_name, summoner_tag, summoner_region) {
+  match scuttle::get_puuid_from_gamename(&summoner_name, &summoner_tag, &summoner_region) {
     Ok(puuid) => summoner_puuid = puuid,
     Err(_) => {
       response.insert("success".to_string(), "false".to_string());
@@ -48,5 +50,28 @@ fn get_account(data: HashMap<String, String>) -> Result<HashMap<String, String>,
 
   response.insert("success".to_string(), "true".to_string());
   response.insert("puuid".to_string(), summoner_puuid);
+  response.insert("ign".to_string(), summoner_name);
+  response.insert("tag".to_string(), summoner_tag);
+  response.insert("region".to_string(), summoner_region);
+  Ok(response)
+}
+
+#[tauri::command]
+fn get_account(puuid: String, region: String) -> Result<HashMap<String, String>, String> {
+  let mut response = HashMap::new();
+
+  match scuttle::get_account_from_puuid(puuid, region) {
+    Ok(account) => {
+      for (key, value) in &account {
+        response.insert("success".to_string(), "true".to_string());
+        response.insert(key.to_string(), value.to_string());
+      }
+    },
+    Err(_) => {
+      response.insert("success".to_string(), "false".to_string());
+      return Ok(response);
+    },
+  }
+
   Ok(response)
 }
