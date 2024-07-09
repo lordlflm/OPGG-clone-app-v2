@@ -1,6 +1,6 @@
 const { invoke } = window.__TAURI__.tauri;
 
-validRegions = ["north america", "korea", "europe west", "europe nordic & east", "oceania", "japan", "brazil",
+validRegions = ["north america", "korea", "middle east", "europe west", "europe nordic & east", "oceania", "japan", "brazil",
                 "LAS", "LAN", "russia", "turkiye", "singapore", "philippines", "taiwan", "vietnam", "thailand"];
 
 document.getElementById("summoner-form").addEventListener("submit", async (event) => {

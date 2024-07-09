@@ -1,0 +1,39 @@
+h2 {
+    margin: 10px auto 10px auto;
+    text-align: center;
+} 
+
+form {
+    margin: auto;
+    max-width: 300px;
+    
+}
+
+#summoner-name {
+    max-width: 100%;
+    width: 95%;
+    height: 20px;
+    text-align: center;
+    margin: 5px 0px 5px 0px;
+    border-radius: 7px;
+}
+
+#submit {
+    display: block;
+    margin: 0px auto;
+}
+
+#summoner-region {
+    display: block;
+    text-align: center;
+    margin: 5px auto;
+}
+
+#summoner-input-div {
+    display: block;
+}
+
+#summoner-invalid-div {
+    display: block;
+}
+

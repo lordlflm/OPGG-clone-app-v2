@@ -5,8 +5,6 @@ mod scuttle;
 
 use std::collections::HashMap;
 
-use reqwest::Response;
-
 fn main() {
   tauri::Builder::default()
   .invoke_handler(tauri::generate_handler![get_account_puuid, get_account])
