@@ -9,9 +9,10 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
     invalidFlag = 0;
-
+    
     // TODO make sure name is of valid length
     if (data["summoner-name"] == "") {
+        document.getElementById("summoner-invalid-div").style.display = "block";
         document.getElementById("summoner-name-invalid").textContent = "invalid summoner name";
         invalidFlag++;
     } else {
@@ -19,12 +20,14 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
     }
     //TODO make sure tagline is valid/of valid length
     if (!data["summoner-name"].includes("#")) {
+        document.getElementById("summoner-invalid-div").style.display = "block";
         document.getElementById("summoner-tag-invalid").textContent = "invalid #tagline";
         invalidFlag++;
     } else {
         document.getElementById("summoner-tag-invalid").textContent = "";
     }
     if (!validRegions.includes(data["summoner-region"])) {
+        document.getElementById("summoner-invalid-div").style.display = "block";
         document.getElementById("summoner-region-invalid").textContent = "invalid region";
         invalidFlag++;
     } else {

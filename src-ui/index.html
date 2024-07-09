@@ -8,46 +8,47 @@
   </head>
 
   <body>
-    <h2>Enter in-game name and region</h2>
-
-    <form id="summoner-form">
-      <div id="summoner-input-div">
-        <label for="summoner-name" hidden>Summoner name</label>
-        <input name="summoner-name" id="summoner-name" type="text" placeholder="IGN#TAG">
+    <div id="form-container-div">
+      <h2>Enter in-game name and region</h2>
+      <form id="summoner-form">
+        <div id="summoner-input-div">
+          <label for="summoner-name" hidden>Summoner name</label>
+          <input name="summoner-name" id="summoner-name" type="text" placeholder="IGN#TAG">
+    
+          <label for="summoner-region" hidden>Summoner region</label>
+          <select name="summoner-region" id="summoner-region">
+            <option value="">Select region</option>
+            <option value="north america">North America</option>
+            <option value="korea">Korea</option>
+            <option value="middle east">Middle East</option>
+            <option value="europe west">Europe West</option>
+            <option value="europe nordic & east">Europe Nordic & East</option>
+            <option value="oceania">Oceania</option>
+            <option value="japan">Japan</option>
+            <option value="brazil">Brazil</option>
+            <option value="LAS">LAS</option>
+            <option value="LAN">LAN</option>
+            <option value="russia">Russia</option>
+            <option value="turkiye">Türkiye</option>
+            <option value="singapore">Singapore</option>
+            <option value="philippines">Philippines</option>
+            <option value="taiwan">Taiwan</option>
+            <option value="vietnam">Vietnam</option>
+            <option value="thailand">Thailand</option>
+          </select>
+        </div>
+        <div id="summoner-invalid-div">
+          <p id="summoner-invalid"></p>
+          <p id="summoner-name-invalid"></p>
+          <p id="summoner-tag-invalid"></p>
+          <p id="summoner-region-invalid"></p>
+        </div>
   
-        <label for="summoner-region" hidden>Summoner region</label>
-        <select name="summoner-region" id="summoner-region">
-          <option value="">Select region</option>
-          <option value="north america">North America</option>
-          <option value="korea">Korea</option>
-          <option value="middle east">Middle East</option>
-          <option value="europe west">Europe West</option>
-          <option value="europe nordic & east">Europe Nordic & East</option>
-          <option value="oceania">Oceania</option>
-          <option value="japan">Japan</option>
-          <option value="brazil">Brazil</option>
-          <option value="LAS">LAS</option>
-          <option value="LAN">LAN</option>
-          <option value="russia">Russia</option>
-          <option value="turkiye">Türkiye</option>
-          <option value="singapore">Singapore</option>
-          <option value="philippines">Philippines</option>
-          <option value="taiwan">Taiwan</option>
-          <option value="vietnam">Vietnam</option>
-          <option value="thailand">Thailand</option>
-        </select>
-      </div>
-      <div id="summoner-invalid-div">
-        <p id="summoner-invalid"></p>
-        <p id="summoner-name-invalid"></p>
-        <p id="summoner-tag-invalid"></p>
-        <p id="summoner-region-invalid"></p>
-      </div>
+        <input type="submit" value="Find Summoner" id="submit">
+      </form>
+    </div>
 
-      <input type="submit" value="Find Summoner" id="submit">
-    </form>
-
-    <h2 id="top-players-h2">Top players</h2>
+    <h2 id="top-players-h2" hidden>Top players</h2>
 
     <script src="/form_handler.js"></script>
   </body>

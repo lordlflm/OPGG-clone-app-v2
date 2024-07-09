@@ -1,12 +1,25 @@
+body {
+    background-color: #353739;
+}
+
 h2 {
-    margin: 10px auto 10px auto;
+    margin: 0px auto 10px auto;
     text-align: center;
+    color: #7BB6F1;
 } 
 
 form {
     margin: auto;
     max-width: 300px;
-    
+    text-align: center;
+}
+
+#form-container-div {
+    border: 3px, solid, #2B2D2F;
+    border-radius: 7px;
+    padding: 1% 3%;
+    max-width: fit-content;
+    margin: auto;
 }
 
 #summoner-name {
@@ -14,19 +27,69 @@ form {
     width: 95%;
     height: 20px;
     text-align: center;
-    margin: 5px 0px 5px 0px;
+    margin: 0px 0px 5px 0px;
     border-radius: 7px;
+    background-color: #525457;
+    color: white;
+}
+
+input#summoner-name:hover::placeholder {
+    color: white;
+}
+
+input#summoner-name:-webkit-autofill,
+input#summoner-name:-webkit-autofill:hover, 
+input#summoner-name:-webkit-autofill:focus, 
+input#summoner-name:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #525457 inset !important;
+}
+
+input#summoner-name:-webkit-autofill{
+    -webkit-text-fill-color: white !important;
+}
+
+select#summoner-region:-webkit-autofill,
+select#summoner-region:-webkit-autofill:hover, 
+select#summoner-region:-webkit-autofill:focus, 
+select#summoner-region:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #525457 inset !important;
+}
+
+select#summoner-region:-webkit-autofill{
+    -webkit-text-fill-color: white !important;
+}
+
+input#summoner-name::placeholder {
+    color: #92969B;
 }
 
 #submit {
     display: block;
-    margin: 0px auto;
+    margin: 10px auto 0px auto;
+    background-color: #7BB6F1;
+    border-radius: 7px;
+}
+
+input#submit:hover {
+    color: white;
+    background-color: #5c89b6;
 }
 
 #summoner-region {
     display: block;
     text-align: center;
     margin: 5px auto;
+    background-color: #525457;
+    color: #92969B;
+    border-radius: 5px;
+}
+
+#summoner-region:hover {
+    color: white;
+}
+
+#summoner-region:focus {
+    color: white;
 }
 
 #summoner-input-div {
@@ -34,6 +97,18 @@ form {
 }
 
 #summoner-invalid-div {
-    display: block;
+    display: none;
+    max-width: 60%;
+    text-align: left;
+    margin: 10px auto;
+    text-align: center;
+    border: 2px, solid, #2B2D2F;
+    border-radius: 5px;
+    background-color: #525457;
 }
 
+#summoner-invalid-div p {
+    margin: 5px 0px;
+    color: red;
+    font-weight: bold;
+}
