@@ -7,13 +7,13 @@ use std::collections::HashMap;
 
 fn main() {
   tauri::Builder::default()
-  .invoke_handler(tauri::generate_handler![get_account_puuid, get_account])
+  .invoke_handler(tauri::generate_handler![get_puuid, get_account, get_league])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn get_account_puuid(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
+fn get_puuid(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
   let mut response = HashMap::new();
   let summoner_name: String;
   let summoner_tag: String;
@@ -44,14 +44,13 @@ fn get_account_puuid(data: HashMap<String, String>) -> Result<HashMap<String, St
       for (key, value) in &summoner {
         response.insert(key.to_string(), value.to_string());
       }
+      return Ok(response);
     },
     Err(_) => {
       response.insert("success".to_string(), "false".to_string());
       return Ok(response);
     },
   }
-
-  Ok(response)
 }
 
 #[tauri::command]
@@ -69,12 +68,35 @@ fn get_account(puuid: String, region: String) -> Result<HashMap<String, String>,
       for (key, value) in &account {
         response.insert(key.to_string(), value.to_string());
       }
+      return Ok(response);
     },
     Err(_) => {
       response.insert("success".to_string(), "false".to_string());
       return Ok(response);
     },
   }
+}
 
-  Ok(response)
+#[tauri::command]
+fn get_league(summoner_id: String, region: String) -> Result<HashMap<String, String>, String> {
+  let mut response = HashMap::new();
+
+  match scuttle::get_league_from_summoner_id(summoner_id, region) {
+    Ok(league) => {
+      if league.len() == 0 {
+        response.insert("success".to_string(), "false".to_string());
+        return Ok(response);
+      }
+
+      response.insert("success".to_string(), "true".to_string());
+      for (key, value) in &league {
+        response.insert(key.to_string(), value.to_string());
+      }
+      return Ok(response);
+    },
+    Err(_) => {
+      response.insert("success".to_string(), "false".to_string());
+      return Ok(response);
+    },
+  }
 }

@@ -39,7 +39,7 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
 
     if (invalidFlag == 0) {
         try {
-            const response = await invoke('get_account_puuid', { data });
+            const response = await invoke('get_puuid', { data });
             if (response.success === "true") {
                 document.getElementById("summoner-invalid").textContent = "";
                 const queryParams = new URLSearchParams();

@@ -122,3 +122,11 @@ input#submit:hover {
     margin: auto;
     margin-bottom: 10px;
 }
+
+#profile-div {
+    border: 3px, solid, #2B2D2F;
+}
+
+#rank-div {
+    border: 3px, solid, #2B2D2F;
+}

@@ -65,6 +65,40 @@ pub async fn get_account_from_puuid(puuid: String, region: String) -> Result<Has
   Ok(response)
 }
 
+#[tokio::main]
+pub async fn get_league_from_summoner_id(summoner_id: String, region: String) -> Result<HashMap<String, String>, Error> {
+  let mut response = HashMap::new();
+  let region_tag: String;
+  match get_region_tag(&region) {
+    Ok(region_tag_string) => region_tag = region_tag_string,
+    Err(_) => return Ok(response), // this could probably be done better but the Err return type is reqwest::Error
+  }
+
+  let url = format!("https://{region}.api.riotgames.com/lol/league/v4/entries/by-summoner/{id}?api_key={api_key}",
+    region = region_tag,
+    id = summoner_id,
+    api_key = *RIOT_API_KEY);
+
+  // problem is there is multiple json object in the response
+  let league_response = reqwest::get(url)
+    .await?
+    .json::<HashMap<String, Value>>()
+    .await?;
+
+  
+  for (key, value) in &league_response {
+    let val = value;
+    for (k, v) in value {
+    }
+  }
+
+  for (key, value) in &league_response {
+    response.insert(key.to_string(), value.to_string());
+  }
+
+  Ok(response)
+}
+
 // fn get_region_continent(region: &String) -> String {
 //   match region.as_str() {
 //     "north america" | "brazil" | "LAS" | "LAN" => return "americas".to_string(),
