@@ -84,12 +84,11 @@ pub async fn get_league_from_summoner_id(summoner_id: String, region: String) ->
     .await?
     .json::<HashMap<String, Value>>()
     .await?;
-
   
   for (key, value) in &league_response {
     let val = value;
     for (k, v) in value {
-      
+
     }
   }
 
