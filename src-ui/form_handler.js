@@ -43,8 +43,8 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
             if (response.success === "true") {
                 document.getElementById("summoner-invalid").textContent = "";
                 const queryParams = new URLSearchParams();
-                queryParams.append("ign", response.ign);
-                queryParams.append("tag", response.tag);
+                queryParams.append("gameName", response.gameName);
+                queryParams.append("tagLine", response.tagLine);
                 queryParams.append("region", response.region);
                 queryParams.append("puuid", response.puuid);
                 window.location.href = `summoner.html?${queryParams.toString()}`;

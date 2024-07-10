@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         queryParams[key] = value;
     }
     summoner.puuid = queryParams["puuid"];
-    summoner.ign = queryParams["ign"];
-    summoner.tag = queryParams["tag"];
+    summoner.ign = queryParams["gameName"];
+    summoner.tag = queryParams["tagLine"];
     summoner.server = queryParams["region"];
 
     try {
