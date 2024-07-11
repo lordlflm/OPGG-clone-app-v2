@@ -97,5 +97,14 @@ function displaySummoner() {
     document.getElementById("tag").textContent = "#" + summoner.tagLine;
     document.getElementById("server").textContent = summoner.server;
     document.getElementById("level").textContent = summoner.level;
-    document.getElementById("icon").src = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.iconId}.jpg`
+    document.getElementById("icon").src = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.iconId}.jpg`;
+    if (summoner.soloLeague.tier) {
+        document.getElementById("rank").textContent = summoner.soloLeague.tier + " " + 
+            summoner.soloLeague.rank + " " + summoner.soloLeague.leaguePoints + " LP";
+            winrate = Math.round(parseInt(summoner.soloLeague.wins, 10)/(parseInt(summoner.soloLeague.wins, 10)+parseInt(summoner.soloLeague.losses, 10))*100);
+        document.getElementById("winrate").textContent = summoner.soloLeague.wins + " wins / " + 
+            summoner.soloLeague.losses + " losses (" + winrate + "% winrate)";
+    } else {
+        document.getElementById("rank").textContent = "Unranked";
+    }
 }
