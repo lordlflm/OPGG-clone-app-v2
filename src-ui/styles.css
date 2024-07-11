@@ -130,3 +130,7 @@ input#submit:hover {
 #rank-div {
     border: 3px, solid, #2B2D2F;
 }
+
+img#rank-icon {
+    height: 300px;
+}
