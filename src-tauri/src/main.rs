@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 fn main() {
   tauri::Builder::default()
-  .invoke_handler(tauri::generate_handler![get_puuid, get_account, get_league])
+  .invoke_handler(tauri::generate_handler![get_puuid, get_account, get_leagues])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
 }
@@ -78,24 +78,32 @@ fn get_account(puuid: String, region: String) -> Result<HashMap<String, String>,
 }
 
 #[tauri::command]
-fn get_league(summoner_id: String, region: String) -> Result<HashMap<String, String>, String> {
-  let mut response = HashMap::new();
+fn get_leagues(summoner_id: String, region: String) -> Result<Vec<HashMap<String, String>>, String> {
+  let mut response = Vec::new();
+  let mut response_map = HashMap::new();
 
   match scuttle::get_league_from_summoner_id(summoner_id, region) {
-    Ok(league) => {
-      if league.len() == 0 {
-        response.insert("success".to_string(), "false".to_string());
+    Ok(leagues) => {
+      if leagues.len() == 0 {
+        response_map.insert("success".to_string(), "false".to_string());
+        response.push(response_map);
         return Ok(response);
       }
 
-      response.insert("success".to_string(), "true".to_string());
-      for (key, value) in &league {
-        response.insert(key.to_string(), value.to_string());
+      response_map.insert("success".to_string(), "true".to_string());
+      response.push(response_map);
+      for entry in leagues {
+        let mut tmp_map = HashMap::new();
+        for (key, value) in entry {
+          tmp_map.insert(key.to_string(), value.to_string());
+        }
+        response.push(tmp_map);
       }
       return Ok(response);
     },
     Err(_) => {
-      response.insert("success".to_string(), "false".to_string());
+      response_map.insert("success".to_string(), "false".to_string());
+      response.push(response_map);
       return Ok(response);
     },
   }
