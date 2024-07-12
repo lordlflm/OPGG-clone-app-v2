@@ -3,8 +3,9 @@ use urlencoding::encode;
 use reqwest::Error;
 use dotenv::dotenv;
 use lazy_static::lazy_static;
+use serde::{Serialize, Deserialize};
 
-use std::collections::HashMap;
+use std::{collections::HashMap, result};
 
 lazy_static! {
   static ref RIOT_API_KEY: String = {
@@ -93,6 +94,33 @@ pub async fn get_league_from_summoner_id(summoner_id: String, region: String) ->
   }
 
   Ok(response)
+}
+
+#[tokio::main]
+pub async fn get_challenger_players_from_queue(queue: &String, region_tag: String) -> Result<Vec<HashMap<String, Value>>, Error> {
+  let mut response = Vec::new();
+
+  let url = format!("https://{region}.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/{queue}?api_key={api_key}",
+    region = region_tag,
+    queue = queue,
+    api_key = *RIOT_API_KEY);
+
+  let challenger_players_response = reqwest::get(url)
+    .await?
+    .json::<HashMap<String, Value>>()
+    .await?;
+
+  for (key, value) in &challenger_players_response {
+    if key == "entries" {
+      let datas: Vec<HashMap<String, Value>> = serde_json::from_value(value.clone()).unwrap();
+      for entry in datas.iter() {
+        response.push(entry.clone());
+      }
+    }
+  }
+
+  Ok(response)
+
 }
 
 fn get_region_tag(region: &String) -> Result<String, ()> {

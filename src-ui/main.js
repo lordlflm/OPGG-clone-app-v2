@@ -56,3 +56,17 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
         }
     }
 });
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const top_solo_players = await invoke("get_top_players", { queue: "RANKED_SOLO_5x5" });
+        if (top_players[0].success === "true") {
+            console.debug("GOOOOD");
+        } else {
+            console.debug("NOOOOO");
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});

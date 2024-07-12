@@ -5,9 +5,11 @@ mod scuttle;
 
 use std::collections::HashMap;
 
+use serde_json::Value;
+
 fn main() {
   tauri::Builder::default()
-  .invoke_handler(tauri::generate_handler![get_puuid, get_account, get_leagues])
+  .invoke_handler(tauri::generate_handler![get_puuid, get_top_players, get_account, get_leagues])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
 }
@@ -106,5 +108,65 @@ fn get_leagues(summoner_id: String, region: String) -> Result<Vec<HashMap<String
       response.push(response_map);
       return Ok(response);
     },
+  }
+}
+
+#[tauri::command]
+fn get_top_players(queue: String) -> Result<Vec<HashMap<String, String>>, String> {
+  let mut response = Vec::new();
+
+  get_queue_top_player(&queue, "na1".to_string(), &mut response);
+  get_queue_top_player(&queue, "br1".to_string(), &mut response);
+  get_queue_top_player(&queue, "kr".to_string(), &mut response);
+  get_queue_top_player(&queue, "eun1".to_string(), &mut response);
+  get_queue_top_player(&queue, "euw1".to_string(), &mut response);
+  get_queue_top_player(&queue, "ru1".to_string(), &mut response);
+
+  // One of the call result in an error (len is 5 not 6 as expected)
+  println!("{}", response.len());
+
+  for entry in &response {
+    println!("{}", entry.get("summonerId").expect("wrong"));
+  }
+  // match scuttle::get_challenger_players_from_queue(&queue, "br1".to_string()) {
+  //   Ok(players) => {},
+  //   Err(_) => {},
+  // }
+  // match scuttle::get_challenger_players_from_queue(&queue, "kr".to_string()) {
+  //   Ok(players) => {},
+  //   Err(_) => {},
+  // }
+  // match scuttle::get_challenger_players_from_queue(&queue, "eun1".to_string()) {
+  //   Ok(players) => {},
+  //   Err(_) => {},
+  // }
+  // match scuttle::get_challenger_players_from_queue(&queue, "euw1".to_string()) {
+  //   Ok(players) => {},
+  //   Err(_) => {},
+  // }
+  // match scuttle::get_challenger_players_from_queue(&queue, "ru1".to_string()) {
+  //   Ok(players) => {},
+  //   Err(_) => {},
+  // }
+
+  Ok(response)
+}
+
+fn get_queue_top_player(queue: &String, region: String, response: &mut Vec<HashMap<String, String>>) {
+  match scuttle::get_challenger_players_from_queue(&queue, region) {
+    Ok(mut players) => {
+      let mut top_player = players.pop().expect("something went wrong");
+      for player in players {
+        if player.get("leaguePoints").as_ref().unwrap().as_u64().unwrap() > top_player.get("leaguePoints").as_ref().unwrap().as_u64().unwrap() {
+          top_player = player;
+        }
+      }
+      let mut top_player_map = HashMap::new();
+      for (key, value) in top_player {
+        top_player_map.insert(key, value.to_string());
+      }
+      response.push(top_player_map);
+    },
+    Err(_) => {},
   }
 }
