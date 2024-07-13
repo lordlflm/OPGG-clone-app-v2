@@ -137,10 +137,7 @@ async fn get_top_players(queue: String) -> Result<Vec<HashMap<String, String>>, 
 
   for top_player in &top_players {
     match top_player {
-      Ok(player) => {
-        println!("{}", player.get("summonerId").unwrap());
-        response.push(player.clone())
-      },
+      Ok(player) => response.push(player.clone()),
       Err(e) => eprintln!("Error: {:?}", e),
     }
   }
@@ -163,6 +160,7 @@ async fn get_queue_top_player(queue: &String, region: String) -> Result<HashMap<
       for (key, value) in top_player {
         response.insert(key, value.to_string());
       }
+      response.insert("region".to_string(), region);
       return Ok(response);
     },
     Err(_) => return Err(format!("Couldn't fetch top player for {region}", region = region)),
