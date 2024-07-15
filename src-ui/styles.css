@@ -134,3 +134,13 @@ input#submit:hover {
 img#rank-icon {
     height: 300px;
 }
+
+#top-players-container-div a img {
+    height: 50px;
+}
+
+#top-player-div {
+    border: 3px, solid, #2B2D2F;
+    padding: 10px;
+    margin: 10px;
+}

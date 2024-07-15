@@ -33,6 +33,47 @@ validRegions = ["north america", "korea", "middle east", "europe west", "europe 
 let top_solo_players = new Array();
 let top_flex_players = new Array();
 
+function region_tag_to_region(tag) {
+    switch (tag) {
+        case "na1":
+            return "north america";
+        case "br1": 
+            return "brazil";
+        case "kr":
+            return "korea";
+        case "la1":
+            return "LAN";
+        case "la2":
+            return "LAS";
+        case "eun1":
+            return "europe nordic & east";
+        case "euw1":
+            return "europe west";
+        case "oc1":
+            return "oceania";
+        case "jp1":
+            return "japan";
+        case "ru1", "ru":
+            return "russia";
+        case "tr1":
+            return "turkiye";
+        case "me1":
+            return "middle east";
+        case "ph2":
+            return "philippines";
+        case "sg2":
+            return "singapore";
+        case "tw2":
+            return "taiwan";
+        case "th2":
+            return "thailand";
+        case "vn2":
+            return "vietnam"
+        default:
+            return "ERROR";
+    }
+}
+
 document.getElementById("summoner-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     
@@ -94,13 +135,26 @@ document.addEventListener("DOMContentLoaded", async () => {
             for (let player of top_players) {
                 let summoner_object = new Summoner();
                 summoner_object.id = player.summonerId.slice(1, -1);
-                summoner_object.server = player.region;
+                summoner_object.server = region_tag_to_region(player.region);
                 summoner_object.soloLeague.leaguePoints = player.leaguePoints;
                 summoner_object.soloLeague.wins = player.wins;
                 summoner_object.soloLeague.losses = player.losses;
                 top_solo_players.push(summoner_object);
 
-                // const summoner = await invoke("")
+                // calling this in the loop creates slow performance
+                const summoner = await invoke("get_summoner_by_id", { id: summoner_object.id, region: summoner_object.server });
+                if (summoner.success === "true") {
+                    console.debug(summoner);
+                    summoner_object.iconId = summoner.profileIconId;
+                    summoner_object.level = summoner.summonerLevel;
+                    summoner_object.accountId = summoner.accountId.slice(1, -1);
+                    summoner_object.puuid = summoner.puuid.slice(1, -1);
+                } else {
+                    //do nothing?
+                    return;
+                }
+
+                
             }
 
             console.debug(top_solo_players);
@@ -117,15 +171,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 function display_top_players(queue) {
     if (queue == "RANKED_SOLO_5x5") {
         for (let summoner of top_solo_players) {
+            //this div is used to have a border for now since anchors dont display border as expected
             let summoner_div = document.createElement("div");
+            summoner_div.id = "top-player-div";
+            let summoner_anchor = document.createElement("a");
+            summoner_anchor.href = `summoner.html?gameName=${encodeURIComponent(summoner.gameName)}&region=${encodeURIComponent(summoner.server)}&puuid=${summoner.puuid}`;
             let region = document.createTextNode(`Top challenger of ${summoner.server}`);
-            let winrate = document.createTextNode(`${summoner.soloLeague.wins} wins / ${summoner.soloLeague.losses} losses (${Math.round(parseInt(summoner.soloLeague.wins, 10)/(parseInt(summoner.soloLeague.wins, 10)+parseInt(summoner.soloLeague.losses, 10))*100)} winrate)`);
+            let winrate = document.createTextNode(`${summoner.soloLeague.wins} wins / ${summoner.soloLeague.losses} losses (${Math.round(parseInt(summoner.soloLeague.wins, 10)/(parseInt(summoner.soloLeague.wins, 10)+parseInt(summoner.soloLeague.losses, 10))*100)}% winrate)`);
             let lp = document.createTextNode(`Challenger ${summoner.soloLeague.leaguePoints} LP`);
-            summoner_div.appendChild(region);
-            summoner_div.appendChild(document.createElement("br"));
-            summoner_div.appendChild(lp)
-            summoner_div.appendChild(document.createElement("br"));
-            summoner_div.appendChild(winrate);
+            let icon = document.createElement("img");
+            icon.src = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.iconId}.jpg`;
+            summoner_anchor.appendChild(icon);
+            summoner_anchor.appendChild(document.createElement("br"));
+            summoner_anchor.appendChild(region);
+            summoner_anchor.appendChild(document.createElement("br"));
+            summoner_anchor.appendChild(lp)
+            summoner_anchor.appendChild(document.createElement("br"));
+            summoner_anchor.appendChild(winrate);
+            summoner_div.appendChild(summoner_anchor);
             document.getElementById("top-players-container-div").appendChild(summoner_div);
         }
     } else if (queue == "RANKED_FLEX_5x5") {

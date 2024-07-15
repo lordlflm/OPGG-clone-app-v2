@@ -17,7 +17,7 @@ const VALID_REGIONS: [&str; 17] = ["north america", "korea", "middle east", "eur
                                    "oceania", "japan", "brazil", "LAS", "LAN", "russia", "turkiye", "singapore",
                                    "philippines", "taiwan", "vietnam", "thailand"];
 
-pub async fn get_puuid_from_gamename(summoner_name: &String, summoner_tag: &String) -> Result<HashMap<String, String>, Error> {
+pub async fn get_account_from_gamename(summoner_name: &String, summoner_tag: &String) -> Result<HashMap<String, String>, Error> {
   let mut response = HashMap::new();
   
   let url = format!("https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={api_key}",
@@ -38,7 +38,7 @@ pub async fn get_puuid_from_gamename(summoner_name: &String, summoner_tag: &Stri
   Ok(response)
 }
 
-pub async fn get_account_from_puuid(puuid: String, region: String) -> Result<HashMap<String, String>, Error> {
+pub async fn get_summoner_from_puuid(puuid: String, region: String) -> Result<HashMap<String, String>, Error> {
   let mut response = HashMap::new();
   let region_tag: String;
   match get_region_tag(&region) {
@@ -116,6 +116,31 @@ pub async fn get_challenger_players_from_queue(queue: &String, region_tag: &Stri
 
   Ok(response)
 
+}
+
+pub async fn get_summoner_from_summoner_id(id: String, region: String) -> Result<HashMap<String, String>, Error> {
+  let mut response = HashMap::new();
+  let region_tag: String;
+  match get_region_tag(&region) {
+    Ok(region_tag_string) => region_tag = region_tag_string,
+    Err(_) => return Ok(response), // this could probably be done better but the Err return type is reqwest::Error
+  }
+
+  let url = format!("https://{region}.api.riotgames.com/lol/summoner/v4/summoners/{summoner_id}?api_key={api_key}",
+    region = region_tag,
+    summoner_id = id,
+    api_key = *RIOT_API_KEY);
+
+  let summoner_response = reqwest::get(url)
+    .await?
+    .json::<HashMap<String, Value>>()
+    .await?;
+
+  for (key, value) in &summoner_response {
+    response.insert(key.to_string(), value.to_string());
+  }
+
+  Ok(response)
 }
 
 fn get_region_tag(region: &String) -> Result<String, ()> {

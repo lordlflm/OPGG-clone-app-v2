@@ -8,7 +8,7 @@ use std::collections::HashMap;
 #[tokio::main]
 async fn main() {
   tauri::Builder::default()
-  .invoke_handler(tauri::generate_handler![get_puuid, get_top_players, get_account, get_leagues])
+  .invoke_handler(tauri::generate_handler![get_puuid, get_top_players, get_summoner_by_id, get_account, get_leagues])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
 }
@@ -38,7 +38,7 @@ async fn get_puuid(data: HashMap<String, String>) -> Result<HashMap<String, Stri
     None => return Err("Something went wrong: No summoner region".to_string()),
   }
 
-  match scuttle::get_puuid_from_gamename(&summoner_name, &summoner_tag).await {
+  match scuttle::get_account_from_gamename(&summoner_name, &summoner_tag).await {
     Ok(summoner) => {
       response.insert("success".to_string(), "true".to_string());
       response.insert("region".to_string(), summoner_region);
@@ -58,7 +58,7 @@ async fn get_puuid(data: HashMap<String, String>) -> Result<HashMap<String, Stri
 async fn get_account(puuid: String, region: String) -> Result<HashMap<String, String>, String> {
   let mut response = HashMap::new();
 
-  match scuttle::get_account_from_puuid(puuid, region).await {
+  match scuttle::get_summoner_from_puuid(puuid, region).await {
     Ok(account) => {
       if account.len() == 0 {
         response.insert("success".to_string(), "false".to_string());
@@ -143,6 +143,30 @@ async fn get_top_players(queue: String) -> Result<Vec<HashMap<String, String>>, 
   }
 
   Ok(response)
+}
+
+#[tauri::command]
+async fn get_summoner_by_id(id: String, region: String) -> Result<HashMap<String, String>, String> {
+  let mut response = HashMap::new();
+
+  match scuttle::get_summoner_from_summoner_id(id, region).await {
+    Ok(summoner) => {
+      if summoner.len() == 0 {
+        response.insert("success".to_string(), "false".to_string());
+        return Ok(response);
+      }
+
+      response.insert("success".to_string(), "true".to_string());
+      for (key, value) in &summoner {
+        response.insert(key.to_string(), value.to_string());
+      }
+      return Ok(response);
+    },
+    Err(_) => {
+      response.insert("success".to_string(), "false".to_string());
+      return Ok(response);
+    },
+  }
 }
 
 async fn get_queue_top_player(queue: &String, region: String) -> Result<HashMap<String, String>, String> {
