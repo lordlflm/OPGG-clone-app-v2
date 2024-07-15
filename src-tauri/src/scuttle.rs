@@ -20,8 +20,7 @@ const VALID_REGIONS: [&str; 17] = ["north america", "korea", "middle east", "eur
 pub async fn get_account_from_gamename(summoner_name: &String, summoner_tag: &String) -> Result<HashMap<String, String>, Error> {
   let mut response = HashMap::new();
   
-  let url = format!("https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={api_key}",
-    region = "americas",
+  let url = format!("https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={api_key}",
     name = encode(summoner_name),
     tag = summoner_tag,
     api_key = *RIOT_API_KEY);
@@ -137,6 +136,25 @@ pub async fn get_summoner_from_summoner_id(id: String, region: String) -> Result
     .await?;
 
   for (key, value) in &summoner_response {
+    response.insert(key.to_string(), value.to_string());
+  }
+
+  Ok(response)
+}
+
+pub async fn get_account_from_puuid(puuid: String) -> Result<HashMap<String, String>, Error> {
+  let mut response = HashMap::new();
+
+  let url = format!("https://americas.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}?api_key={api_key}",
+    puuid = puuid,
+    api_key = *RIOT_API_KEY);
+
+  let account_response = reqwest::get(url)
+    .await?
+    .json::<HashMap<String, Value>>()
+    .await?;
+
+  for (key, value) in &account_response {
     response.insert(key.to_string(), value.to_string());
   }
 

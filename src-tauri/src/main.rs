@@ -8,13 +8,19 @@ use std::collections::HashMap;
 #[tokio::main]
 async fn main() {
   tauri::Builder::default()
-  .invoke_handler(tauri::generate_handler![get_puuid, get_top_players, get_summoner_by_id, get_account, get_leagues])
+  .invoke_handler(tauri::generate_handler![get_account_by_gamename, 
+    get_top_players, 
+    get_summoner_by_id, 
+    get_summoner_by_puuid, 
+    get_leagues,
+    get_account_by_puuid
+  ])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
 }
 
 #[tauri::command]
-async fn get_puuid(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
+async fn get_account_by_gamename(data: HashMap<String, String>) -> Result<HashMap<String, String>, String> {
   let mut response = HashMap::new();
   let summoner_name: String;
   let summoner_tag: String;
@@ -55,7 +61,26 @@ async fn get_puuid(data: HashMap<String, String>) -> Result<HashMap<String, Stri
 }
 
 #[tauri::command]
-async fn get_account(puuid: String, region: String) -> Result<HashMap<String, String>, String> {
+async fn get_account_by_puuid(puuid: String) -> Result<HashMap<String, String>, String> {
+  let mut response = HashMap::new();
+
+  match scuttle::get_account_from_puuid(puuid).await {
+    Ok(account) => {
+      response.insert("success".to_string(), "true".to_string());
+      for (key, value) in &account {
+        response.insert(key.to_string(), value.to_string());
+      }
+      return Ok(response);
+    },
+    Err(_) => {
+      response.insert("success".to_string(), "false".to_string());
+      return Ok(response);
+    },
+  }
+}
+
+#[tauri::command]
+async fn get_summoner_by_puuid(puuid: String, region: String) -> Result<HashMap<String, String>, String> {
   let mut response = HashMap::new();
 
   match scuttle::get_summoner_from_puuid(puuid, region).await {

@@ -79,7 +79,7 @@ document.getElementById("rank-type-select").addEventListener("change", () => {
 });
 
 async function fetch_account() {
-    const account = await invoke('get_account', { puuid: summoner.puuid, region: summoner.server});
+    const account = await invoke('get_summoner_by_puuid', { puuid: summoner.puuid, region: summoner.server});
     if (account.success === "true") {
         summoner.iconId = account.profileIconId;
         summoner.level = account.summonerLevel;

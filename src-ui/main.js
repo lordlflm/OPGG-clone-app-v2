@@ -110,7 +110,7 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
 
     if (invalidFlag == 0) {
         try {
-            const response = await invoke('get_puuid', { data });
+            const response = await invoke('get_account_by_gamename', { data });
             if (response.success === "true") {
                 document.getElementById("summoner-invalid").textContent = "";
                 const queryParams = new URLSearchParams();
@@ -139,27 +139,37 @@ document.addEventListener("DOMContentLoaded", async () => {
                 summoner_object.soloLeague.leaguePoints = player.leaguePoints;
                 summoner_object.soloLeague.wins = player.wins;
                 summoner_object.soloLeague.losses = player.losses;
-                top_solo_players.push(summoner_object);
 
                 // calling this in the loop creates slow performance
                 const summoner = await invoke("get_summoner_by_id", { id: summoner_object.id, region: summoner_object.server });
                 if (summoner.success === "true") {
-                    console.debug(summoner);
                     summoner_object.iconId = summoner.profileIconId;
                     summoner_object.level = summoner.summonerLevel;
                     summoner_object.accountId = summoner.accountId.slice(1, -1);
                     summoner_object.puuid = summoner.puuid.slice(1, -1);
                 } else {
                     //do nothing?
-                    return;
+                    continue;
                 }
 
+                // calling this in the loop creates slow performance
+                const account = await invoke("get_account_by_puuid", { puuid: summoner_object.puuid });
+                if (account.success === "true") {
+                    console.debug(account);
+                    summoner_object.gameName = account.gameName.slice(1, -1);
+                    summoner_object.tagLine = account.tagLine.slice(1, -1);
+                } else {
+                    //do nothing?
+                    continue;
+                }
                 
+                top_solo_players.push(summoner_object);
             }
 
             console.debug(top_solo_players);
             display_top_players("RANKED_SOLO_5x5");
         } else {
+            //TODO couldnt fetch any top players internal error
             console.debug("NOOOOO");
         }
 
@@ -168,6 +178,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
+//might rethink logic here after doing styles (e.g. remove br tags)
 function display_top_players(queue) {
     if (queue == "RANKED_SOLO_5x5") {
         for (let summoner of top_solo_players) {
@@ -181,9 +192,12 @@ function display_top_players(queue) {
             let lp = document.createTextNode(`Challenger ${summoner.soloLeague.leaguePoints} LP`);
             let icon = document.createElement("img");
             icon.src = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.iconId}.jpg`;
+            let name = document.createTextNode(`${summoner.gameName}`);
             summoner_anchor.appendChild(icon);
             summoner_anchor.appendChild(document.createElement("br"));
             summoner_anchor.appendChild(region);
+            summoner_anchor.appendChild(document.createElement("br"));
+            summoner_anchor.appendChild(name);
             summoner_anchor.appendChild(document.createElement("br"));
             summoner_anchor.appendChild(lp)
             summoner_anchor.appendChild(document.createElement("br"));

@@ -139,6 +139,11 @@ img#rank-icon {
     height: 50px;
 }
 
+#top-players-container-div a {
+    text-decoration: none;
+    color: white;
+}
+
 #top-player-div {
     border: 3px, solid, #2B2D2F;
     padding: 10px;
