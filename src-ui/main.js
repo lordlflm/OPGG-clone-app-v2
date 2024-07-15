@@ -130,51 +130,27 @@ document.getElementById("summoner-form").addEventListener("submit", async (event
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const top_players = await invoke("get_top_players", { queue: "RANKED_SOLO_5x5" });
-        if (top_players.length != 0) {
-            for (let player of top_players) {
-                let summoner_object = new Summoner();
-                summoner_object.id = player.summonerId.slice(1, -1);
-                summoner_object.server = region_tag_to_region(player.region);
-                summoner_object.soloLeague.leaguePoints = player.leaguePoints;
-                summoner_object.soloLeague.wins = player.wins;
-                summoner_object.soloLeague.losses = player.losses;
-
-                // calling this in the loop creates slow performance
-                const summoner = await invoke("get_summoner_by_id", { id: summoner_object.id, region: summoner_object.server });
-                if (summoner.success === "true") {
-                    summoner_object.iconId = summoner.profileIconId;
-                    summoner_object.level = summoner.summonerLevel;
-                    summoner_object.accountId = summoner.accountId.slice(1, -1);
-                    summoner_object.puuid = summoner.puuid.slice(1, -1);
-                } else {
-                    //do nothing?
-                    continue;
-                }
-
-                // calling this in the loop creates slow performance
-                const account = await invoke("get_account_by_puuid", { puuid: summoner_object.puuid });
-                if (account.success === "true") {
-                    console.debug(account);
-                    summoner_object.gameName = account.gameName.slice(1, -1);
-                    summoner_object.tagLine = account.tagLine.slice(1, -1);
-                } else {
-                    //do nothing?
-                    continue;
-                }
-                
-                top_solo_players.push(summoner_object);
-            }
-
-            console.debug(top_solo_players);
-            display_top_players("RANKED_SOLO_5x5");
-        } else {
-            //TODO couldnt fetch any top players internal error
-            console.debug("NOOOOO");
+        if (top_solo_players.length == 0) {
+            await populate_top_players_array(top_solo_players, "RANKED_SOLO_5x5");
         }
-
+        display_top_players("RANKED_SOLO_5x5");
     } catch (error) {
         console.error('Error:', error);
+    }
+});
+
+document.getElementById("rank-type-select").addEventListener("change", async () => {
+    rankType = document.getElementById("rank-type-select").value;
+    if (rankType === "flex") {
+        if (top_flex_players.length == 0) {
+            await populate_top_players_array(top_flex_players, "RANKED_FLEX_5x5")
+        }
+        displayFlexRank("RANKED_FLEX_5x5");
+    } else {
+        if (top_solo_players.length == 0) {
+            await populate_top_players_array(top_solo_players, "RANKED_SOLO_5x5");
+        }
+        display_top_players("RANKED_SOLO_5x5");
     }
 });
 
@@ -182,32 +158,66 @@ document.addEventListener("DOMContentLoaded", async () => {
 function display_top_players(queue) {
     if (queue == "RANKED_SOLO_5x5") {
         for (let summoner of top_solo_players) {
-            //this div is used to have a border for now since anchors dont display border as expected
-            let summoner_div = document.createElement("div");
-            summoner_div.id = "top-player-div";
-            let summoner_anchor = document.createElement("a");
-            summoner_anchor.href = `summoner.html?gameName=${encodeURIComponent(summoner.gameName)}&region=${encodeURIComponent(summoner.server)}&puuid=${summoner.puuid}`;
-            let region = document.createTextNode(`Top challenger of ${summoner.server}`);
-            let winrate = document.createTextNode(`${summoner.soloLeague.wins} wins / ${summoner.soloLeague.losses} losses (${Math.round(parseInt(summoner.soloLeague.wins, 10)/(parseInt(summoner.soloLeague.wins, 10)+parseInt(summoner.soloLeague.losses, 10))*100)}% winrate)`);
-            let lp = document.createTextNode(`Challenger ${summoner.soloLeague.leaguePoints} LP`);
-            let icon = document.createElement("img");
-            icon.src = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.iconId}.jpg`;
-            let name = document.createTextNode(`${summoner.gameName}`);
-            summoner_anchor.appendChild(icon);
-            summoner_anchor.appendChild(document.createElement("br"));
-            summoner_anchor.appendChild(region);
-            summoner_anchor.appendChild(document.createElement("br"));
-            summoner_anchor.appendChild(name);
-            summoner_anchor.appendChild(document.createElement("br"));
-            summoner_anchor.appendChild(lp)
-            summoner_anchor.appendChild(document.createElement("br"));
-            summoner_anchor.appendChild(winrate);
-            summoner_div.appendChild(summoner_anchor);
-            document.getElementById("top-players-container-div").appendChild(summoner_div);
+            display_summoner(summoner);
         }
     } else if (queue == "RANKED_FLEX_5x5") {
-
+        for (let summoner of top_flex_players) {
+            display_summoner(summoner);
+        }
     } else {
-
+        //TODO display nothing?
     }
+}
+
+async function populate_top_players_array(top_players_array, queueType) {
+    const top_players = await invoke("get_top_players", { queue: queueType });
+    if (top_players.length != 0) {
+        console.debug(top_players);
+        for (let player of top_players) {
+            if (player.success === "true") {
+                let summoner_object = new Summoner();
+                summoner_object.id = player.summonerId.slice(1, -1);
+                summoner_object.server = region_tag_to_region(player.region);
+                summoner_object.soloLeague.leaguePoints = player.leaguePoints;
+                summoner_object.soloLeague.wins = player.wins;
+                summoner_object.soloLeague.losses = player.losses;
+                summoner_object.accountId = player.accountId.slice(1, -1);
+                summoner_object.puuid = player.puuid.slice(1, -1);
+                summoner_object.iconId = player.profileIconId;
+                summoner_object.level = player.summonerLevel;
+                summoner_object.gameName = player.gameName.slice(1, -1);
+                summoner_object.tagLine = player.tagLine.slice(1, -1);
+                
+                top_players_array.push(summoner_object);
+            }
+        }
+    } else {
+        //TODO couldnt fetch any top players internal error
+        console.debug("NOOOOO");
+    }
+}
+
+function display_summoner(summoner) {
+    //this div is used to have a border for now since anchors dont display border as expected
+    let summoner_div = document.createElement("div");
+    summoner_div.id = "top-player-div";
+    let summoner_anchor = document.createElement("a");
+    summoner_anchor.href = `summoner.html?gameName=${encodeURIComponent(summoner.gameName)}&region=${encodeURIComponent(summoner.server)}&puuid=${summoner.puuid}`;
+    let region = document.createTextNode(`Top challenger of ${summoner.server}`);
+    let winrate = document.createTextNode(`${summoner.soloLeague.wins} wins / ${summoner.soloLeague.losses} losses (${Math.round(parseInt(summoner.soloLeague.wins, 10)/(parseInt(summoner.soloLeague.wins, 10)+parseInt(summoner.soloLeague.losses, 10))*100)}% winrate)`);
+    let lp = document.createTextNode(`Challenger ${summoner.soloLeague.leaguePoints} LP`);
+    let icon = document.createElement("img");
+    icon.src = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.iconId}.jpg`;
+    let name = document.createTextNode(`${summoner.gameName}`);
+    summoner_anchor.appendChild(icon);
+    summoner_anchor.appendChild(document.createElement("br"));
+    summoner_anchor.appendChild(region);
+    summoner_anchor.appendChild(document.createElement("br"));
+    summoner_anchor.appendChild(name);
+    summoner_anchor.appendChild(document.createElement("br"));
+    summoner_anchor.appendChild(lp)
+    summoner_anchor.appendChild(document.createElement("br"));
+    summoner_anchor.appendChild(winrate);
+    summoner_div.appendChild(summoner_anchor);
+    document.getElementById("top-players-container-div").appendChild(summoner_div);
 }

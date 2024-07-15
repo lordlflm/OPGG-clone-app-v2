@@ -10,10 +10,8 @@ async fn main() {
   tauri::Builder::default()
   .invoke_handler(tauri::generate_handler![get_account_by_gamename, 
     get_top_players, 
-    get_summoner_by_id, 
     get_summoner_by_puuid, 
     get_leagues,
-    get_account_by_puuid
   ])
   .run(tauri::generate_context!())
   .expect("error while running tauri application");
@@ -49,25 +47,6 @@ async fn get_account_by_gamename(data: HashMap<String, String>) -> Result<HashMa
       response.insert("success".to_string(), "true".to_string());
       response.insert("region".to_string(), summoner_region);
       for (key, value) in &summoner {
-        response.insert(key.to_string(), value.to_string());
-      }
-      return Ok(response);
-    },
-    Err(_) => {
-      response.insert("success".to_string(), "false".to_string());
-      return Ok(response);
-    },
-  }
-}
-
-#[tauri::command]
-async fn get_account_by_puuid(puuid: String) -> Result<HashMap<String, String>, String> {
-  let mut response = HashMap::new();
-
-  match scuttle::get_account_from_puuid(puuid).await {
-    Ok(account) => {
-      response.insert("success".to_string(), "true".to_string());
-      for (key, value) in &account {
         response.insert(key.to_string(), value.to_string());
       }
       return Ok(response);
@@ -160,9 +139,49 @@ async fn get_top_players(queue: String) -> Result<Vec<HashMap<String, String>>, 
 
   let top_players = futures::future::join_all(top_players_futures).await;
 
+  let mut top_players_summoner_futures = Vec::new();
   for top_player in &top_players {
     match top_player {
-      Ok(player) => response.push(player.clone()),
+      Ok(player) => {
+        top_players_summoner_futures.push(get_summoner_by_id(player["summonerId"].clone()[1..player["summonerId"].clone().len()-1].to_string(), player["region"].clone()));
+        response.push(player.clone());
+      },
+      Err(e) => eprintln!("Error: {:?}", e),
+    }
+  }
+
+  let top_players_summoner = futures::future::join_all(top_players_summoner_futures).await;
+  let mut top_players_account_futures = Vec::new();
+  for top_player_summoner in &top_players_summoner {
+    match top_player_summoner {
+      Ok(summoner) => {
+        for entry in response.iter_mut() {
+          if entry["summonerId"] == summoner["id"] {
+            for (key, value) in summoner {
+              entry.insert(key.to_string(), value.to_string());
+            }
+            top_players_account_futures.push(get_account_by_puuid(entry["puuid"].clone()[1..entry["puuid"].clone().len()-1].to_string()));
+            break;
+          }
+        }
+      },
+      Err(e) => eprintln!("Error: {:?}", e),
+    }
+  }
+
+  let top_players_account = futures::future::join_all(top_players_account_futures).await;
+  for top_player_account in &top_players_account {
+    match top_player_account {
+      Ok(account) => {
+        for entry in response.iter_mut() {
+          if entry["puuid"] == account["puuid"] {
+            for (key, value) in account {
+              entry.insert(key.to_string(), value.to_string());
+            }
+            break;
+          }
+        }
+      },
       Err(e) => eprintln!("Error: {:?}", e),
     }
   }
@@ -170,7 +189,6 @@ async fn get_top_players(queue: String) -> Result<Vec<HashMap<String, String>>, 
   Ok(response)
 }
 
-#[tauri::command]
 async fn get_summoner_by_id(id: String, region: String) -> Result<HashMap<String, String>, String> {
   let mut response = HashMap::new();
 
@@ -213,5 +231,23 @@ async fn get_queue_top_player(queue: &String, region: String) -> Result<HashMap<
       return Ok(response);
     },
     Err(_) => return Err(format!("Couldn't fetch top player for {region}", region = region)),
+  }
+}
+
+async fn get_account_by_puuid(puuid: String) -> Result<HashMap<String, String>, String> {
+  let mut response = HashMap::new();
+
+  match scuttle::get_account_from_puuid(puuid).await {
+    Ok(account) => {
+      response.insert("success".to_string(), "true".to_string());
+      for (key, value) in &account {
+        response.insert(key.to_string(), value.to_string());
+      }
+      return Ok(response);
+    },
+    Err(_) => {
+      response.insert("success".to_string(), "false".to_string());
+      return Ok(response);
+    },
   }
 }

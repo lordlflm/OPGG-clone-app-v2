@@ -162,28 +162,28 @@ pub async fn get_account_from_puuid(puuid: String) -> Result<HashMap<String, Str
 }
 
 fn get_region_tag(region: &String) -> Result<String, ()> {
-  if !VALID_REGIONS.contains(&region.as_str()) {
-    return Err(());
-  }
+  // if !VALID_REGIONS.contains(&region.as_str()) {
+  //   return Err(());
+  // }
 
   match region.as_str() {
-    "north america" => Ok("na1".to_string()),
-    "brazil" => Ok("br1".to_string()),
-    "LAS" => Ok("la2".to_string()),
-    "LAN" => Ok("la1".to_string()),
-    "korea" => Ok("kr".to_string()),
-    "europe nordic & east" => Ok("eun1".to_string()),
-    "europe west" => Ok("euw1".to_string()),
-    "oceania" => Ok("oc1".to_string()),
-    "japan" => Ok("jp1".to_string()),
-    "russia" => Ok("ru1".to_string()),
-    "turkiye" => Ok("tr1".to_string()),
-    "middle east" => Ok("me1".to_string()),
-    "philippines" => Ok("ph2".to_string()),
-    "singapore" => Ok("sg2".to_string()),
-    "taiwan" => Ok("tw2".to_string()),
-    "thailand" => Ok("th2".to_string()),
-    "vietnam" => Ok("vn2".to_string()),
+    "north america" | "na1" => Ok("na1".to_string()),
+    "brazil" | "br1" => Ok("br1".to_string()),
+    "LAS" | "la2" => Ok("la2".to_string()),
+    "LAN" | "la1" => Ok("la1".to_string()),
+    "korea" | "kr" => Ok("kr".to_string()),
+    "europe nordic & east" | "eun1" => Ok("eun1".to_string()),
+    "europe west" | "euw1" => Ok("euw1".to_string()),
+    "oceania" | "oc1" => Ok("oc1".to_string()),
+    "japan" | "jp1" => Ok("jp1".to_string()),
+    "russia" | "ru1" | "ru" => Ok("ru".to_string()),
+    "turkiye" | "tr1" => Ok("tr1".to_string()),
+    "middle east" | "me1" => Ok("me1".to_string()),
+    "philippines" | "ph2" => Ok("ph2".to_string()),
+    "singapore" | "sg2" => Ok("sg2".to_string()),
+    "taiwan" | "tw2" => Ok("tw2".to_string()),
+    "thailand" | "th2" => Ok("th2".to_string()),
+    "vietnam" | "vn2" => Ok("vn2".to_string()),
     _ => return Err(()),
   }
 }
