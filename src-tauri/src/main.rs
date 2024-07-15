@@ -129,12 +129,12 @@ async fn get_top_players(queue: String) -> Result<Vec<HashMap<String, String>>, 
     get_queue_top_player(&queue, "la2".to_string()),
     get_queue_top_player(&queue, "jp1".to_string()),
     get_queue_top_player(&queue, "oc1".to_string()),
-    get_queue_top_player(&queue, "me1".to_string()),
     get_queue_top_player(&queue, "ph2".to_string()),
     get_queue_top_player(&queue, "sg2".to_string()),
     get_queue_top_player(&queue, "tw2".to_string()),
     get_queue_top_player(&queue, "tr1".to_string()),
     get_queue_top_player(&queue, "th2".to_string()),
+    get_queue_top_player(&queue, "me1".to_string()),
   ];
 
   let top_players = futures::future::join_all(top_players_futures).await;
@@ -217,8 +217,12 @@ async fn get_queue_top_player(queue: &String, region: String) -> Result<HashMap<
   
   match scuttle::get_challenger_players_from_queue(&queue, &region).await {
     Ok(mut players) => {
-      let mut top_player = players.pop()
-        .expect(format!("something went wrong while fetching {region} top player", region = region).as_str());
+      let mut top_player;
+      match players.pop() {
+        Some(player) => top_player = player,
+        None => return Err(format!("something went wrong while fetching {region} top player", region = region)),
+      }
+        // .expect(format!("something went wrong while fetching {region} top player", region = region).as_str());
       for player in players {
         if player.get("leaguePoints").as_ref().unwrap().as_u64().unwrap() > top_player.get("leaguePoints").as_ref().unwrap().as_u64().unwrap() {
           top_player = player;

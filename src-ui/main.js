@@ -143,9 +143,9 @@ document.getElementById("rank-type-select").addEventListener("change", async () 
     rankType = document.getElementById("rank-type-select").value;
     if (rankType === "flex") {
         if (top_flex_players.length == 0) {
-            await populate_top_players_array(top_flex_players, "RANKED_FLEX_5x5")
+            await populate_top_players_array(top_flex_players, "RANKED_FLEX_SR")
         }
-        displayFlexRank("RANKED_FLEX_5x5");
+        display_top_players("RANKED_FLEX_SR");
     } else {
         if (top_solo_players.length == 0) {
             await populate_top_players_array(top_solo_players, "RANKED_SOLO_5x5");
@@ -154,13 +154,15 @@ document.getElementById("rank-type-select").addEventListener("change", async () 
     }
 });
 
-//might rethink logic here after doing styles (e.g. remove br tags)
 function display_top_players(queue) {
+    if (document.getElementById("top-player-div")) {
+        document.getElementById("top-player-div").remove();
+    }
     if (queue == "RANKED_SOLO_5x5") {
         for (let summoner of top_solo_players) {
             display_summoner(summoner);
         }
-    } else if (queue == "RANKED_FLEX_5x5") {
+    } else if (queue == "RANKED_FLEX_SR") {
         for (let summoner of top_flex_players) {
             display_summoner(summoner);
         }
@@ -197,6 +199,7 @@ async function populate_top_players_array(top_players_array, queueType) {
     }
 }
 
+//might rethink logic here after doing styles (e.g. remove br tags)
 function display_summoner(summoner) {
     //this div is used to have a border for now since anchors dont display border as expected
     let summoner_div = document.createElement("div");
